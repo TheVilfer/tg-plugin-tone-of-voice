@@ -69,7 +69,7 @@ Each page (`data`) has `messages` (`text`, `date`, `chatType`), `count`, `cursor
   their answer, and stop and ask again on every further wait. Never wait and retry in a loop.
 - **The command fails with `flood_wait`**: nothing was read in that run. Tell the user the wait and
   stop, as above; run the same command again only when the user says so.
-- **The command fails saying the cursor is unknown or expired** (`plugin_error`; cursors last 24
+- **The command fails with `invalid_cursor`** (the cursor is unknown or expired; cursors last 24
   hours and belong to one account): the collection ends here, at the messages you already have
   (the sum of the pages' `count`). Do not start over to fill the rest: a new walk starts from the
   newest messages again, so it would repeat what you have. If that is too little and the user wants

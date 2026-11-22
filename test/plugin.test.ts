@@ -123,7 +123,7 @@ describe("the collect command", () => {
     const e = await failure(
       collect({ limit: 5, cursor: "AAAAAAAAAAAAAAAAAAAAAA" })
     );
-    expect(e).toMatchObject({ code: "plugin_error", exitCode: 1 });
+    expect(e).toMatchObject({ code: "invalid_cursor", exitCode: 1 });
     expect(e.message).toContain("cursor is unknown or expired");
   });
 
