@@ -1,0 +1,26 @@
+{
+  "name": "tg-plugin-tone-of-voice",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The official Tone of Voice plugin for Better-TG-CLI: drafts messages in the user's own voice",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tg-plugin build && tg-plugin build test/probes/stats",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "lint": "oxlint && oxfmt --check",
+    "fix": "oxlint --fix && oxfmt",
+    "validate": "telegram plugin validate .",
+    "dev": "telegram plugin dev . collect --mock --input '{\"limit\":20}'"
+  },
+  "devDependencies": {
+    "@better-tg/plugin-sdk": "^0.1.0",
+    "@types/node": "^26.6.2",
+    "oxfmt": "0.79.0",
+    "oxlint": "1.94.0",
+    "typescript": "^7.0.2",
+    "ultracite": "8.3.1",
+    "vitest": "^5.1.1"
+  }
+}

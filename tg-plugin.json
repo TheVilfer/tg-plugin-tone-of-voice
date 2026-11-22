@@ -1,0 +1,193 @@
+{
+  "$schema": "https://better-tg-cli.com/schemas/tg-plugin/2026-11-21.json",
+  "name": "tone-of-voice",
+  "version": "1.0.0",
+  "description": "Writes messages in the user's own voice when no exact text is given",
+  "author": {
+    "name": "Better-TG-CLI team",
+    "url": "https://github.com/TheVilfer"
+  },
+  "license": "MIT",
+  "engines": { "better-tg-cli": ">=0.41.0" },
+  "main": "dist/plugin.js",
+  "files": [
+    "tg-plugin.json",
+    "SKILL.md",
+    "onboarding.md",
+    "templates/style.md",
+    "dist/plugin.js"
+  ],
+  "permissions": ["messages:read-own"],
+  "network": [],
+  "secrets": [],
+  "settings": {},
+  "resources": {
+    "compose": "SKILL.md#compose",
+    "onboarding": "onboarding.md",
+    "template": "templates/style.md"
+  },
+  "storage": { "keys": ["style"], "quotaBytes": 262144 },
+  "commands": [
+    {
+      "name": "collect",
+      "description": "Collects one page of the user's own messages with simple style statistics for the style guide",
+      "effects": [],
+      "input": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "integer", "minimum": 1, "maximum": 2000 },
+          "types": {
+            "type": "array",
+            "items": { "enum": ["private", "group"] },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "cursor": { "type": "string", "minLength": 1 }
+        },
+        "required": ["limit"],
+        "not": { "required": ["cursor", "types"] },
+        "additionalProperties": false
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": { "type": "string" },
+                "date": { "type": "string" },
+                "chatType": { "enum": ["private", "group"] }
+              },
+              "required": ["text", "date", "chatType"],
+              "additionalProperties": false
+            }
+          },
+          "count": { "type": "integer", "minimum": 0 },
+          "cursor": { "type": ["string", "null"] },
+          "remaining": { "type": "integer", "minimum": 0 },
+          "done": { "type": "boolean" },
+          "retryAfterSeconds": { "type": ["integer", "null"], "minimum": 0 },
+          "stats": { "$ref": "#/$defs/stats" }
+        },
+        "required": [
+          "messages",
+          "count",
+          "cursor",
+          "remaining",
+          "done",
+          "retryAfterSeconds",
+          "stats"
+        ],
+        "additionalProperties": false,
+        "$defs": {
+          "tally": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": { "type": "string", "minLength": 1, "maxLength": 32 },
+                "count": { "type": "integer", "minimum": 1 }
+              },
+              "required": ["value", "count"],
+              "additionalProperties": false
+            }
+          },
+          "stats": {
+            "type": "object",
+            "properties": {
+              "messages": { "type": "integer", "minimum": 0 },
+              "chars": { "type": "integer", "minimum": 0 },
+              "words": { "type": "integer", "minimum": 0 },
+              "multiline": { "type": "integer", "minimum": 0 },
+              "length": {
+                "type": "object",
+                "properties": {
+                  "short": { "type": "integer", "minimum": 0 },
+                  "medium": { "type": "integer", "minimum": 0 },
+                  "long": { "type": "integer", "minimum": 0 },
+                  "veryLong": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["short", "medium", "long", "veryLong"],
+                "additionalProperties": false
+              },
+              "emoji": {
+                "type": "object",
+                "properties": {
+                  "messages": { "type": "integer", "minimum": 0 },
+                  "total": { "type": "integer", "minimum": 0 },
+                  "counts": { "$ref": "#/$defs/tally" }
+                },
+                "required": ["messages", "total", "counts"],
+                "additionalProperties": false
+              },
+              "scripts": {
+                "type": "object",
+                "properties": {
+                  "cyrillic": { "type": "integer", "minimum": 0 },
+                  "latin": { "type": "integer", "minimum": 0 },
+                  "mixed": { "type": "integer", "minimum": 0 },
+                  "other": { "type": "integer", "minimum": 0 },
+                  "none": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["cyrillic", "latin", "mixed", "other", "none"],
+                "additionalProperties": false
+              },
+              "greetings": { "$ref": "#/$defs/tally" },
+              "signOffs": { "$ref": "#/$defs/tally" },
+              "punctuation": {
+                "type": "object",
+                "properties": {
+                  "endsWithPeriod": { "type": "integer", "minimum": 0 },
+                  "endsWithExclamation": { "type": "integer", "minimum": 0 },
+                  "endsWithQuestion": { "type": "integer", "minimum": 0 },
+                  "endsWithEllipsis": { "type": "integer", "minimum": 0 },
+                  "endsWithEmoji": { "type": "integer", "minimum": 0 },
+                  "endsWithoutPunctuation": { "type": "integer", "minimum": 0 },
+                  "bracketSmiley": { "type": "integer", "minimum": 0 },
+                  "startsLowercase": { "type": "integer", "minimum": 0 },
+                  "startsUppercase": { "type": "integer", "minimum": 0 }
+                },
+                "required": [
+                  "endsWithPeriod",
+                  "endsWithExclamation",
+                  "endsWithQuestion",
+                  "endsWithEllipsis",
+                  "endsWithEmoji",
+                  "endsWithoutPunctuation",
+                  "bracketSmiley",
+                  "startsLowercase",
+                  "startsUppercase"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "messages",
+              "chars",
+              "words",
+              "multiline",
+              "length",
+              "emoji",
+              "scripts",
+              "greetings",
+              "signOffs",
+              "punctuation"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "compose",
+      "when": "The user asks to write or reply to someone but gives no exact text",
+      "resource": "compose"
+    }
+  ],
+  "onboarding": { "resource": "onboarding", "doneWhen": { "storage": "style" } }
+}
